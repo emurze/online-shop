@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Your shopping cart{% endblock %}
+
+{% block content %}
+	<h1>Your shopping cart</h1>
+	<table class="cart">
+		<thead>
+			<tr>
+				<th>Image</th>
+				<th>Product</th>
+				<th>Quantity</th>
+				<th>Remove</th>
+				<th>Unit price</th>
+				<th>Price</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for product in cart %}
+				{% with instance=product.instance %}
+					<tr>
+						<td>
+							<a href="{{ instance.get_absolute_url }}">
+								<img alt=""
+									 src="{% if instance.image %}
+											  {{ instance.image.url }}
+										  {% else %}
+											  {% static "images/no_image.png" %}
+										  {% endif %}">
+							</a>
+						</td>
+						<td>{{ instance.name }}</td>
+						<td>
+							<form action="{% url 'cart:add' instance.id %}" method="POST">
+								{% csrf_token %}
+								{{ product.update_quality_form.quantity }}
+								{{ product.update_quality_form.override }}
+								<input type="submit" value="Update">
+							</form>
+						</td>
+						<td>
+						<form action="{% url "cart:remove" instance.id %}" method="POST">
+							<input type="submit" value="Remove">
+							{% csrf_token %}
+						</form>
+						</td>
+						<td class="num">${{ product.price }}</td>
+						<td class="num">${{ product.total_price }}</td>
+					</tr>
+				{% endwith %}
+			{% endfor %}
+			<tr class="total">
+				<td>Total</td>
+				<td colspan="4"></td>
+				<td class="num">
+					<span class="num_total_price">
+						${{ cart.get_total_price }}
+					</span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<p class="text-right">
+	<a href="{% url "shop:list" %}" class="button light">
+		Continue shopping
+	</a>
+	<a href="#" class="button">Checkout</a>
+	</p>
+{% endblock %}
