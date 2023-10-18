@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'apps.base.apps.BaseConfig',
     'apps.shop.apps.ShopConfig',
     'apps.cart.apps.CartConfig',
+    'apps.orders.apps.OrdersConfig',
 ]
 
 MIDDLEWARE = [
@@ -81,4 +82,9 @@ DEFAULT_ADMIN_EMAIL = os.getenv('DEFAULT_ADMIN_EMAIL', 'adm1@adm1.com')
 
 DEFAULT_ADMIN_PASSWORD = os.getenv('DEFAULT_ADMIN_PASSWORD', 'adm1')
 
-SESSION_CART_ID = 'cart'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+MAIN_PAGE_REDIRECT = 'shop:list'
+
+CELERY_BROKER_URL = 'amqp://adm1:adm1@rabbitmq:5672'
+# amqp://user:password@host:5672

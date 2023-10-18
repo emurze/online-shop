@@ -20,7 +20,7 @@
 							{{ cart_length }} cart{{ cart_length|pluralize }}
 							${{ cart.get_total_price }}
 						</a>
-					{% else %}
+					{% elif not order_id %}
 						Your cart is empty.
 					{% endif %}
 				{% endwith %}

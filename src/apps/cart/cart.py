@@ -57,8 +57,6 @@ class Cart:
             override_quantity: bool = False) -> None:
         """Add product or increase quantity of product"""
 
-        lg.debug(override_quantity)
-
         product_id = str(product.id)
 
         if not self.cart.get(product_id):
@@ -89,7 +87,10 @@ class Cart:
 
     def __len__(self) -> int:
         """Get total quantity"""
-        return sum(int(product['quantity']) for product in self.cart.values())
+        return sum(
+            (int(product['quantity']) for product in self.cart.values()),
+            start=0
+        )
 
     def get_total_price(self) -> int:
         return sum(

@@ -10,6 +10,26 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  rabbitmq:
+    image: rabbitmq:3.9.29-management-alpine
+    container_name: 'rabbitmq'
+    networks:
+      - backend
+    ports:
+      - '15672:15672'
+    env_file:
+      - ./env/.rabbitmq.env
+    restart: unless-stopped
+
+  redis:
+    image: 'redis:7'
+    container_name: 'redis'
+    networks:
+      - backend
+    ports:
+      - '16379:16379'
+    restart: unless-stopped
+
   online_shop:
     build: .
     container_name: 'online_shop'
@@ -32,6 +52,43 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+      - redis
+      - rabbitmq
+
+  worker1:
+    build: .
+    container_name: 'worker1'
+    command: >
+      sh -c "cd src && 
+             poetry run celery -A celery_app.app worker --loglevel=info"
+    networks:
+      - backend
+    volumes:
+      - ./src:/service/src
+      - app_static:/service/src/static
+      - app_media:/service/src/media
+    env_file:
+      - ./env/.online_shop.env
+    restart: unless-stopped
+    depends_on:
+      - online_shop
+
+#  flower:
+#    build: .
+#    container_name: 'flower'
+#    command: >
+#      sh -c "cd src &&
+#             poetry run celery -A celery_app.app flower"
+#    networks:
+#      - backend
+#    ports:
+#      - '5555:5555'
+#    volumes:
+#      - ./src:/service/src
+#    depends_on:
+#      - rabbitmq
+#      - online_shop
+#    restart: unless-stopped
 
 networks:
   backend:
