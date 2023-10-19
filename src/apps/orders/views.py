@@ -1,6 +1,6 @@
 import logging
 
-from .tasks import log_message
+from .tasks import send_message
 from django.conf import settings
 from django.core.cache import cache
 from django.core.handlers.wsgi import WSGIRequest
@@ -20,7 +20,7 @@ lg = logging.getLogger(__name__)
 
 
 class CreateOrderView(CreateView):
-    success_url = reverse_lazy('orders:create_success')
+    success_url = reverse_lazy('payment:process')
     template_name = 'orders/create.html'
     form_class = OrderCreateForm
     model = Order
@@ -53,7 +53,7 @@ class CreateOrderView(CreateView):
         cache.set(f'order_id_{self.request.session.session_key}', order.id,
                   timeout=settings.SUCCESS_ORDER_CACHE_EXPIRATION)
 
-        log_message.delay()
+        send_message.delay(order.id)
 
         return super().form_valid(form)
 

@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'apps.shop.apps.ShopConfig',
     'apps.cart.apps.CartConfig',
     'apps.orders.apps.OrdersConfig',
+    'apps.payment.apps.PaymentConfig',
 ]
 
 MIDDLEWARE = [
@@ -88,3 +89,7 @@ MAIN_PAGE_REDIRECT = 'shop:list'
 
 CELERY_BROKER_URL = 'amqp://adm1:adm1@rabbitmq:5672'
 # amqp://user:password@host:5672
+
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51O2lgKAhviFXYgbJCgPmBw93bwjlM6dknhYPIeEE3rpkxD4pseXnm8VOnMw1OlaAsB8pZ4om4gzqyw9LMZuXIUIe00LOklzkbu'
+STRIPE_SECRET_KEY = 'sk_test_51O2lgKAhviFXYgbJAtVsWSlS8FnOTzqHdmo6IKusw0YnKRXk6dqQ1MnsJkehQ48jFRGQ191nIaZEzNl9xMqsuAxP00xYN3Je1J'
+STRIPE_API_VERSION = '2022-08-01'

@@ -28,8 +28,8 @@ services:
       - backend
     ports:
       - '16379:16379'
-#    volumes:
-#      - cache:/data
+    volumes:
+      - cache_data:/data
     restart: unless-stopped
 
   online_shop:
@@ -95,5 +95,6 @@ networks:
 
 volumes:
   postgres_data:
+  cache_data:
   app_static:
   app_media:

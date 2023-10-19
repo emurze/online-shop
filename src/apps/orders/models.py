@@ -35,7 +35,7 @@ class Order(models.Model):
         return f'Order {self.id}'
 
     def get_total_cost(self) -> decimal:
-        return sum(item.get_total_cost() for item in self.order_items)
+        return sum(item.get_cost() for item in self.order_items.all())
 
 
 class OrderItem(models.Model):

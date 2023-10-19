@@ -1,12 +1,24 @@
 import logging
 
 from celery import shared_task
-from celery_singleton import Singleton
+from django.core.mail import send_mail
+
+from apps.orders.models import Order
 
 lg = logging.getLogger(__name__)
 
 
 @shared_task
-def log_message() -> str:
-    lg.debug('Hello world')
-    return 'God bless you'
+def send_message(order_id: int) -> None:
+    order = Order.objects.get(id=order_id)
+    subject = f'Order nr. {order.id}'
+    message = f'Dear {order.first_name},\n\n' \
+              f'You have successfully placed an order.' \
+              f'Your order ID is {order.id}.'
+    mail_sent = send_mail(
+        subject,
+        message,
+        'adm1@adm1.com',
+        [order.email],
+    )
+    return mail_sent

@@ -16,6 +16,7 @@ redis = "^5.0.1"
 celery = ">=5.2.7,<5.3.0"
 celery-singleton = "0.3.1"
 flower = "^2.0.1"
+stripe = "^7.0.0"
 
 [build-system]
 requires = ["poetry-core"]
