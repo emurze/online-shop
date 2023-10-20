@@ -9,16 +9,15 @@ lg = logging.getLogger(__name__)
 
 
 @shared_task
-def send_message(order_id: int) -> None:
+def order_created(order_id: int) -> None:
     order = Order.objects.get(id=order_id)
     subject = f'Order nr. {order.id}'
     message = f'Dear {order.first_name},\n\n' \
               f'You have successfully placed an order.' \
               f'Your order ID is {order.id}.'
-    mail_sent = send_mail(
+    send_mail(
         subject,
         message,
         'adm1@adm1.com',
-        [order.email],
+        (order.email,),
     )
-    return mail_sent

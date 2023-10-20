@@ -1,6 +1,5 @@
 import csv
 import datetime
-import logging
 from typing import Any
 
 from django.contrib import admin
@@ -12,8 +11,6 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe, SafeString
 
 from apps.orders.models import Order, OrderItem
-
-lg = logging.getLogger(__name__)
 
 
 class OrderItemInline(admin.TabularInline):
@@ -33,6 +30,12 @@ def order_payment(obj: Order) -> Any | SafeString:
 def order_detail(obj: Order) -> Any | SafeString:
     message = 'View'
     url = reverse('orders:admin_order_detail', args=(str(obj.id),))
+    return mark_safe(f'<a href="{url}">{message}</a>')
+
+
+def order_pdf(obj: Order) -> Any | SafeString:
+    message = 'PDF'
+    url = reverse('orders:admin_order_pdf', args=(str(obj.id),))
     return mark_safe(f'<a href="{url}">{message}</a>')
 
 
@@ -82,6 +85,7 @@ class OrderAdmin(admin.ModelAdmin):
         order_payment,
         'paid',
         order_detail,
+        order_pdf,
     )
     list_editable = ('paid',)
     inlines = (OrderItemInline,)

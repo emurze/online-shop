@@ -25,7 +25,6 @@ class PaymentProcess(View):
 
     @expire_success_token_redirect
     def get(self, request: WSGIRequest, *args, **kwargs) -> HttpResponse:
-        lg.debug('worked 1')
         context = {'order': self._get_order_from_cache()}
         return render(request, self.template_name, context)
 

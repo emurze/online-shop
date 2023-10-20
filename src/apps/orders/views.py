@@ -1,10 +1,12 @@
 import logging
 
+import weasyprint
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
 from django.views.decorators.http import require_GET
 
-from .tasks import send_message
+from .tasks import order_created
 from django.conf import settings
 from django.core.cache import cache
 from django.core.handlers.wsgi import WSGIRequest
@@ -57,7 +59,7 @@ class CreateOrderView(CreateView):
         cache.set(f'order_id_{self.request.session.session_key}', order.id,
                   timeout=settings.SUCCESS_ORDER_CACHE_EXPIRATION)
 
-        send_message.delay(order.id)
+        order_created.delay(order.id)
 
         return super().form_valid(form)
 
@@ -78,7 +80,24 @@ class CreateOrderSuccessView(TemplateView):
 
 @require_GET
 @staff_member_required
-def admin_order_detail(request: WSGIRequest, order_id: int) -> HttpResponse:
+def admin_order_detail(request: WSGIRequest, order_id: str) -> HttpResponse:
     order = get_object_or_404(Order, id=order_id)
-    template_name = 'admin/detail.html'
+    template_name = 'orders/admin/detail.html'
     return render(request, template_name, {'order': order})
+
+
+@require_GET
+@staff_member_required
+def admin_order_pdf(request: WSGIRequest, order_id: str) -> HttpResponse:
+    order = get_object_or_404(Order, id=order_id)
+    template_name = 'orders/admin/pdf.html'
+    html = render_to_string(template_name, {'order': order})
+
+    response = HttpResponse(content_type='application/pdf')
+    response['CONTENT-DISPOSITION'] = f'filename={order_id}.pdf'
+
+    weasyprint.HTML(string=html).write_pdf(
+        response,
+        stylesheets=(settings.STATIC_ROOT / 'css/pdf.css',),
+    )
+    return response

@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from stripe.error import SignatureVerificationError
 
 from apps.orders.models import Order
+from .tasks import payment_completed
 
 lg = logging.getLogger(__name__)
 
@@ -19,10 +20,9 @@ class PaymentEvent(enum.StrEnum):
 
 
 @csrf_exempt
-def stripe_webhook(request):
+def stripe_webhook(request: WSGIRequest):
     payload = request.body
     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
-    event = None
 
     try:
         event = stripe.Webhook.construct_event(
@@ -30,12 +30,8 @@ def stripe_webhook(request):
             sig_header,
             settings.STRIPE_WEBHOOK_SECRET
         )
-    except ValueError as e:
+    except (ValueError, stripe.error.SignatureVerificationError):
         return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as e:
-        return HttpResponse(status=400)
-
-    lg.debug('worked')
 
     if event.type == PaymentEvent.COMPLETED:
         session = event.data.object
@@ -48,5 +44,7 @@ def stripe_webhook(request):
             order.paid = True
             order.payment_id = session.payment_intent
             order.save()
+
+            payment_completed.delay(order.id)
 
     return HttpResponse(status=200)
