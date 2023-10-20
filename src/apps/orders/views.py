@@ -1,5 +1,9 @@
 import logging
 
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render, get_object_or_404
+from django.views.decorators.http import require_GET
+
 from .tasks import send_message
 from django.conf import settings
 from django.core.cache import cache
@@ -70,3 +74,11 @@ class CreateOrderSuccessView(TemplateView):
             f'order_id_{self.request.session.session_key}'
         )
         return super().get_context_data(**kwargs)
+
+
+@require_GET
+@staff_member_required
+def admin_order_detail(request: WSGIRequest, order_id: int) -> HttpResponse:
+    order = get_object_or_404(Order, id=order_id)
+    template_name = 'admin/detail.html'
+    return render(request, template_name, {'order': order})

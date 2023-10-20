@@ -55,6 +55,15 @@ services:
       - redis
       - rabbitmq
 
+  payment:
+    image: 'stripe/stripe-cli'
+    container_name: 'payment'
+    command: "listen --forward-to 0.0.0.0:8080/payment/webhook/"
+    network_mode: "host"
+    depends_on:
+      - online_shop
+    restart: unless-stopped
+
   worker1:
     build: .
     container_name: 'worker1'
@@ -73,61 +82,6 @@ services:
     depends_on:
       - rabbitmq
       - online_shop
-
-  worker2:
-    build: .
-    container_name: 'worker2'
-    command: >
-      sh -c "cd src && 
-             poetry run celery -A celery_app.app worker --loglevel=info"
-    networks:
-      - backend
-    volumes:
-      - ./src:/service/src
-      - app_static:/service/src/static
-      - app_media:/service/src/media
-    env_file:
-      - ./env/.online_shop.env
-    restart: unless-stopped
-    depends_on:
-      - rabbitmq
-      - online_shop
-
-  worker3:
-    build: .
-    container_name: 'worker3'
-    command: >
-      sh -c "cd src && 
-             poetry run celery -A celery_app.app worker --loglevel=info"
-    networks:
-      - backend
-    volumes:
-      - ./src:/service/src
-      - app_static:/service/src/static
-      - app_media:/service/src/media
-    env_file:
-      - ./env/.online_shop.env
-    restart: unless-stopped
-    depends_on:
-      - rabbitmq
-      - online_shop
-
-  flower:
-    build: .
-    container_name: 'flower'
-    command: >
-      sh -c "cd src &&
-             poetry run celery -A celery_app.app flower"
-    networks:
-      - backend
-    ports:
-      - '5555:5555'
-    volumes:
-      - ./src:/service/src
-    depends_on:
-      - rabbitmq
-      - online_shop
-    restart: unless-stopped
 
 networks:
   backend:

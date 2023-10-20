@@ -16,7 +16,7 @@ def empty_cart_redirect(func: Callable) -> Callable:
 
         """Cart must have at least 1 elem"""
         if not len(cart) != 0:
-            return redirect(settings.MAIN_PAGE_REDIRECT)
+            return redirect(settings.BASE_PAGE_REDIRECT)
 
         return func(self, request, *args, **kwargs)
 
@@ -28,7 +28,7 @@ def expire_success_token_redirect(func: Callable) -> Callable:
     def http_method(self, request: WSGIRequest, *args, **kwargs):
         """Cache must include order_id"""
         if not cache.get(f'order_id_{request.session.session_key}'):
-            return redirect(settings.MAIN_PAGE_REDIRECT)
+            return redirect(settings.BASE_PAGE_REDIRECT)
 
         return func(self, request, *args, **kwargs)
 
