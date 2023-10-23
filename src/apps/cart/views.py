@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST, require_GET
 
 from apps.cart.cart import Cart
 from apps.cart.forms import CartAddProductForm
+from apps.coupons.forms import CouponForm
 from apps.shop.models import Product
 
 lg = logging.getLogger(__name__)
@@ -48,5 +49,9 @@ def cart_detail(request: WSGIRequest) -> HttpResponse:
             }
         )
 
+    context = {
+        'coupon_apply_form': CouponForm(),
+        'cart': cart
+    }
     template_name = 'cart/detail.html'
-    return render(request, template_name, {'cart': cart})
+    return render(request, template_name, context)

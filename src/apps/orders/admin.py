@@ -28,15 +28,15 @@ def order_payment(obj: Order) -> Any | SafeString:
 
 
 def order_detail(obj: Order) -> Any | SafeString:
-    message = 'View'
+    label = 'View'
     url = reverse('orders:admin_order_detail', args=(str(obj.id),))
-    return mark_safe(f'<a href="{url}">{message}</a>')
+    return mark_safe(f'<a href="{url}">{label}</a>')
 
 
 def order_pdf(obj: Order) -> Any | SafeString:
-    message = 'PDF'
+    label = 'PDF'
     url = reverse('orders:admin_order_pdf', args=(str(obj.id),))
-    return mark_safe(f'<a href="{url}">{message}</a>')
+    return mark_safe(f'<a href="{url}">{label}</a>')
 
 
 def export_to_csv(

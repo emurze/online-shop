@@ -1,9 +1,13 @@
+import decimal
 import logging
 from _decimal import Decimal
+from functools import lru_cache
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.handlers.wsgi import WSGIRequest
 
+from apps.coupons.models import Coupon
 from apps.shop.models import Product
 
 lg = logging.getLogger(__name__)
@@ -23,12 +27,16 @@ class Cart:
         """Get cart from session or set to session"""
 
         self.session = request.session
+        self.session_key = self.session.session_key
 
         cart = self.session.get(settings.SESSION_CART_ID)
         if not cart:
             cart = self.session[settings.SESSION_CART_ID] = {}
 
         self.cart = cart
+        self.coupon_id = cache.get(
+            f'{settings.SESSION_COUPON_ID}_{self.session_key}'
+        )
 
     def __iter__(self):
         """
@@ -102,7 +110,26 @@ class Cart:
         del self.session[settings.SESSION_CART_ID]
         self.save()
 
+    @property
+    def coupon(self) -> Coupon | None:
+        if self.coupon_id:
+            try:
+                coupon = Coupon.objects.get(id=self.coupon_id)
+                return coupon
+            except Coupon.DoesNotExist:
+                return None
+        else:
+            return None
+
+    def get_discount(self) -> decimal:
+        if self.coupon:
+            return (self.coupon.discount / Decimal(100) *
+                    Decimal(self.get_total_price()))
+        else:
+            return Decimal(0)
+
+    def get_total_price_after_discount(self) -> decimal:
+        return self.get_total_price() - self.get_discount()
+
     def __str__(self) -> str:
         return str(self.cart)
-
-

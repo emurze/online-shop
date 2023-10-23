@@ -10,20 +10,33 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
-  rabbitmq:
+  message_broker:
     image: rabbitmq:3.9.29-management-alpine
     container_name: 'rabbitmq'
     networks:
       - backend
     ports:
       - '15672:15672'
+    volumes:
+      - message_broker_data:/var/lib/rabbitmq
     env_file:
       - ./env/.rabbitmq.env
     restart: unless-stopped
 
-  redis:
+  recommendation_system:
     image: 'redis:7'
-    container_name: 'redis'
+    container_name: 'recommendation_system'
+    networks:
+      - backend
+    command: >
+      sh -c 'redis-server --port 9001'
+    volumes:
+      - recommendation_data:/data
+    restart: unless-stopped
+
+  cache:
+    image: 'redis:7'
+    container_name: 'cache'
     networks:
       - backend
     volumes:
@@ -53,8 +66,8 @@ services:
     restart: unless-stopped
     depends_on:
       - db
-      - redis
-      - rabbitmq
+      - cache
+      - message_broker
 
   payment:
     image: 'stripe/stripe-cli'
@@ -81,7 +94,7 @@ services:
       - ./env/.online_shop.env
     restart: unless-stopped
     depends_on:
-      - rabbitmq
+      - message_broker
       - online_shop
 
 networks:
@@ -92,3 +105,5 @@ volumes:
   cache_data:
   app_static:
   app_media:
+  recommendation_data:
+  message_broker_data:

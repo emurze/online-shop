@@ -40,8 +40,13 @@ class CreateOrderView(CreateView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form: OrderCreateForm) -> HttpResponse:
-        order = form.save()
         cart = Cart(self.request)
+
+        coupon = cart.coupon
+        order = form.save(commit=False)
+        order.coupon = coupon
+        order.discount = coupon.discount
+        order.save()
 
         OrderItem.objects.bulk_create([
             OrderItem(
@@ -62,20 +67,6 @@ class CreateOrderView(CreateView):
         order_created.delay(order.id)
 
         return super().form_valid(form)
-
-
-class CreateOrderSuccessView(TemplateView):
-    template_name = 'orders/created.html'
-
-    @expire_success_token_redirect
-    def get(self, request: WSGIRequest, *args, **kwargs) -> HttpResponse:
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        kwargs['order_id'] = cache.get(
-            f'order_id_{self.request.session.session_key}'
-        )
-        return super().get_context_data(**kwargs)
 
 
 @require_GET

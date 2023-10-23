@@ -52,7 +52,16 @@ class PaymentProcess(View):
                     'quantity': order_item.quantity,
                 }
                 for order_item in order.order_items.all()
-            ]
+            ],
+            'discounts': [
+                {
+                    'coupon': stripe.Coupon.create(
+                        name=order.coupon.code,
+                        percent_off=order.discount,
+                        duration='once',
+                    ).id
+                }
+            ] if order.coupon else []
         }
 
         session = stripe.checkout.Session.create(**session_data)

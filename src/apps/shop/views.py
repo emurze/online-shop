@@ -5,6 +5,7 @@ from django.views.generic import DetailView
 
 from apps.shop.mixins import BaseProductList, AddCartAddProductFormMixin
 from apps.shop.models import Product
+from apps.shop.reccomender import Recommender
 
 lg = logging.getLogger(__name__)
 
@@ -23,6 +24,8 @@ class ProductFilterList(BaseProductList):
 
     def get_queryset(self) -> QuerySet:
         products = self.queryset
+
+        Recommender.set_vlad()
 
         category_slug: str | None = self.kwargs.get('category_slug')
         if category_slug is not None:

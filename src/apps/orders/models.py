@@ -1,9 +1,12 @@
 import decimal
 import uuid
+from _decimal import Decimal
 
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
+from apps.coupons.models import Coupon
 from apps.shop.models import Product
 
 
@@ -26,6 +29,18 @@ class Order(models.Model):
     updated = models.DateTimeField(auto_now=True)
     payment_id = models.CharField(max_length=256, null=True)
     paid = models.BooleanField(default=False)
+    coupon = models.ForeignKey(Coupon,
+                               related_name='orders',
+                               on_delete=models.SET_NULL,
+                               null=True,
+                               blank=True)
+    discount = models.IntegerField(
+        validators=(
+            MinValueValidator(0),
+            MaxValueValidator(100),
+        ),
+        help_text='percent value (0 to 100)'
+    )
 
     class Meta:
         ordering = ('-created',)
@@ -36,8 +51,17 @@ class Order(models.Model):
     def __str__(self) -> str:
         return f'Order {self.id}'
 
-    def get_total_cost(self) -> decimal:
+    def get_total_cost_before_discount(self) -> decimal:
         return sum(item.get_cost() for item in self.order_items.all())
+
+    def get_discount(self) -> decimal:
+        total_cost = self.get_total_cost_before_discount()
+        if self.discount:
+            return self.discount / Decimal(100) * total_cost
+        return Decimal(0)
+
+    def get_total_cost(self):
+        return self.get_total_cost_before_discount() - self.get_discount()
 
     def get_payment_url(self):
         if not self.payment_id:
