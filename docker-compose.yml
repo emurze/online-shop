@@ -28,10 +28,9 @@ services:
     container_name: 'recommendation_system'
     networks:
       - backend
-    command: >
-      sh -c 'redis-server --port 9001'
+    command: --port 6380
     volumes:
-      - recommendation_data:/data
+      - recommendation_system_data:/data
     restart: unless-stopped
 
   cache:
@@ -105,5 +104,5 @@ volumes:
   cache_data:
   app_static:
   app_media:
-  recommendation_data:
+  recommendation_system_data:
   message_broker_data:

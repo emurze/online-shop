@@ -45,7 +45,7 @@ class CreateOrderView(CreateView):
         coupon = cart.coupon
         order = form.save(commit=False)
         order.coupon = coupon
-        order.discount = coupon.discount
+        order.discount = coupon.discount if coupon else 0
         order.save()
 
         OrderItem.objects.bulk_create([

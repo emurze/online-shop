@@ -1,7 +1,10 @@
+CACHE_HOST = 'cache'
+CACHE_PORT = 6379
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://cache:6379',
+        'LOCATION': f'redis://{CACHE_HOST}:{CACHE_PORT}',
         'OPTIONS': {
             'db': 1,
         },
@@ -9,6 +12,8 @@ CACHES = {
 }
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 SESSION_CACHE_ALIAS = "default"
+
+CACHE_TTL = 60 * 15
 
 SESSION_CART_ID = 'cart'
 SESSION_COUPON_ID = 'coupon_id'

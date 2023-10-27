@@ -356,3 +356,9 @@ form div.field {
 input[name="quantity"] {width: 46px;}
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {opacity: 1;}
+
+.recommended_image {
+    object-fit: cover;
+    width: 220px;
+    height: 170px;
+}
