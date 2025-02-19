@@ -7,7 +7,6 @@
 ## Как запустить проект?
 
 1. Создайте папку env и заполните файлы .db.env и .online_shop.env:
-
 ```mkdir env && > env/.db.env && > env/.online_shop.env```
 
 #### Пример содержания файлов:
@@ -36,7 +35,6 @@ POSTGRES_PASSWORD=12345678
 ```
 
 2. Создайте папку для логов и пустой файл:
-
 ```mkdir src/logs && > src/logs/general.log ```
 
 ## Запустить проект в режиме разработки
