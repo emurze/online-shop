@@ -33,8 +33,8 @@ DB_POST = 5432
 *.db.env*
 ```
 # POSTGRES
-POSTGRES_DB=optimization_app
-POSTGRES_USER=optimization_app
+POSTGRES_DB=db
+POSTGRES_USER=user
 POSTGRES_PASSWORD=12345678
 ```
 
