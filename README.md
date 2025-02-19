@@ -1,37 +1,33 @@
-# PROJECT TEMPLATE
+# Интернет-магазин
 
-# Remove traces
+Интернет-магазин, разработанный на Django по паттерну MVC. Продавцы могут управлять товарами, а клиенты — создавать и оплачивать заказы.
+Проект реализован в монолитной архитектуре
 
-```rm -rf .git```
 
+## Как запустить проект?
 
-# How run project?
-
-Create /env/.db.env and /env/.online_shop.env
+1. Создайте папку env и заполните файлы .db.env и .online_shop.env:
 
 ```mkdir env && > env/.db.env && > env/.online_shop.env```
 
-Fill env/.db.env and env/.online_shop.env
+#### Пример содержания файлов:
 
-For example: 
-
-*env/.online_shop.env*
-
+*.online_shop.env*
 ```
 # APP
-SECRET_KEY=django-insecure-@l8=fm$s+-mjm-2i0)uoly9j+2pctx@+^k27(g$(bqw%i%jk-$
-DEBUG=1
-LOGGING_LEVEL=DEBUG
+SECRET_KEY = ...
+DEBUG = 1
+LOGGING_LEVEL = DEBUG
 
 # DB
-DB_NAME=optimization_app
-DB_USER=optimization_app
-DB_PASSWORD=12345678
-DB_HOST=db
-DB_POST=5432
+DB_NAME = db
+DB_USER = user
+DB_PASSWORD = 12345678
+DB_HOST = db
+DB_POST = 5432
 ```
 
-*env/.db.env*
+*.db.env*
 ```
 # POSTGRES
 POSTGRES_DB=optimization_app
@@ -39,14 +35,14 @@ POSTGRES_USER=optimization_app
 POSTGRES_PASSWORD=12345678
 ```
 
-Create logs dir and general.log file
+2. Создайте папку для логов и пустой файл:
 
 ```mkdir src/logs && > src/logs/general.log ```
 
-Run dev server
+## Запустить проект в режиме разработки
 
 ```docker compose up --build```
 
-Run prod server
+## Запустить проект на продакшене
 
 ```docker compose -f docker-compose.prod.yml up --build```
