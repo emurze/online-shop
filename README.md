@@ -43,10 +43,10 @@ POSTGRES_PASSWORD=12345678
 mkdir src/logs && > src/logs/general.log
 ```
 
-## Запустить проект в режиме разработки
+## Запуск проект в режиме разработки
 
 ```docker compose up --build```
 
-## Запустить проект на продакшене
+## Запуск проекта на продакшене
 
 ```docker compose -f docker-compose.prod.yml up --build```
